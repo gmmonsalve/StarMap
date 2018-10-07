@@ -1,0 +1,5 @@
+class Grafo{
+
+ int caminos[][];
+
+}
