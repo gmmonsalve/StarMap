@@ -15,36 +15,64 @@
  */
 
 public void dibujar(GButton source, GEvent event) { //_CODE_:btndr:906999:
-  println("btncal - GButton >> GEvent." + event + " @ " + millis());
+ 
  int i = star1.getSelectedIndex();
  int n = star2.getSelectedIndex();
-   boolean g = false;
+   boolean g = false,exist=false;
+    String p=null;
+   
+   if(i!=n){//diferentes #1
    Estrella a = estrellas.get(i);
    Estrella b = estrellas.get(n);
-   if(!(a.relaciones.contains(b) && b.relaciones.contains(a))){
-     if(a!=b){
-   while(g==false){
-   String p = JOptionPane.showInputDialog(null,"Digite la distancia en años luz.");
-   if(p!=null){
-    int peso = Integer.parseInt(p);
-   Arista nueva = new Arista(a.x1,a.y1,b.x1,b.y1,peso);
-   a.relaciones.add(b);
-   b.relaciones.add(a);
-   aristas.add(nueva);
-   g = true;
-   }else{
-     JOptionPane.showMessageDialog(null,"Por favor, digite el valor de la distancia en años luz.");
+   
+   if(!(a.aristas.isEmpty())){//primero ver que no esté vacía
+   for(Arista k: a.aristas){
+     if(k.i==a && k.f==b){
+      exist=true;
+      break;
+     }
    }
-   }
+     for(Arista w: b.aristas){
+       if(w.i==b && w.f==a){
+          exist=true;
+          break;
+       }
+     }
+    
    }else{
-   JOptionPane.showMessageDialog(null,"Debe seleccionar estrellas diferentes.");
+   print("ta vacio");
    }
-   }else{
+  
+   
+     if(exist==false){
+       while(!g){
+       p = JOptionPane.showInputDialog(null,"Digite la distancia en años luz.");
+       if(p!=null && p!=""){
+         g=true;
+       }else{
+       JOptionPane.showMessageDialog(null,"Por favor, digite un valor válido");
+       }
+       }
+       try{
+       int peso = Integer.parseInt(p);
+       if(peso>0){
+       a.aristas.add(new Arista(a,b,peso));
+       b.aristas.add(new Arista(b,a,peso));
+       aristas.add(new Arista(a,b,peso));
+       }else{
+       JOptionPane.showMessageDialog(null,"Por favor, digite un valor válido");
+       }
+       }catch(Exception e){
+        JOptionPane.showMessageDialog(null,"Por favor, digite un valor válido");
+       }
+     }else{
      JOptionPane.showMessageDialog(null,"Esta relación ya existe.");
+     }
+   
+   
+   }else{
+    JOptionPane.showMessageDialog(null,"Debe seleccionar Nodos diferentes.");
    }
-   
-   
-   
   
 } //_CODE_:btndr:906999:
 
@@ -57,6 +85,61 @@ public void list2(GDropList source, GEvent event) { //_CODE_:star2:594256:
   println("star2 - GDropList >> GEvent." + event + " @ " + millis());
 } //_CODE_:star2:594256:
 
+public void warshall(GButton source, GEvent event) { //_CODE_:floyd:856741:
+  int i = star1.getSelectedIndex();
+ int n = star2.getSelectedIndex();
+ if(i!=n){
+  floydWar(i,n);
+ }else{
+ JOptionPane.showMessageDialog(null,"Debe seleccionar dos estrellas que existan y sean diferentes.");
+ }
+ 
+} //_CODE_:floyd:856741:
+
+public void limpiar(GButton source, GEvent event) { //_CODE_:clean:305640:
+  reiniciar();
+} //_CODE_:clean:305640:
+
+public void eliminar(GButton source, GEvent event) { //_CODE_:elim:607671:
+  String nombre = JOptionPane.showInputDialog(null,"Ingrese el nombre de la estrella que desea eliminar");
+ boolean enc=false;
+ int pos=0;
+ ArrayList posi = new ArrayList();
+ if(nombre!=null && nombre!=""){
+ for(Estrella a: estrellas){
+    if(a.name.equals(nombre)){
+        enc=true;
+      for(Arista b: aristas){
+        if(b.i==a || b.f==a){
+          posi.add(b);
+        }
+      }
+      pos = estrellas.indexOf(a);
+      break;
+    }
+  }
+  if(!enc){
+   JOptionPane.showMessageDialog(null,"No se encontró la estrella "+nombre);
+ }else{
+   estrellas.remove(pos);
+  for(Object o: posi){
+    aristas.remove(o);
+  }
+  star1.removeItem(pos);
+  star2.removeItem(pos);
+  nombres.remove(pos);
+   if(!(aristasr.isEmpty())){
+     aristasr.clear();
+   }
+ }
+ }else{
+  JOptionPane.showMessageDialog(null,"Por favor, digite un nombre de estrella a eliminar.");
+ }
+  
+  
+ 
+} //_CODE_:elim:607671:
+
 
 
 // Create all the GUI controls. 
@@ -66,27 +149,36 @@ public void createGUI(){
   G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
   G4P.setCursor(ARROW);
   surface.setTitle("Space");
-  btndr = new GButton(this, 300, 14, 99, 30);
-  btndr.setText("Dibujar Arista");
+  btndr = new GButton(this, 300, 8, 99, 26);
+  btndr.setText("Dibujar Camino");
   btndr.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
   btndr.addEventHandler(this, "dibujar");
-  star1 = new GDropList(this, 11, 20, 90, 69, 2);
+  star1 = new GDropList(this, 20, 8, 110, 253, 10);
   star1.setItems(loadStrings("list_304429"), 0);
   star1.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
   star1.addEventHandler(this, "list1");
-  star2 = new GDropList(this, 199, 19, 90, 275, 10);
+  star2 = new GDropList(this, 177, 8, 112, 253, 10);
   star2.setItems(loadStrings("list_594256"), 0);
   star2.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
   star2.addEventHandler(this, "list2");
-  label1 = new GLabel(this, 108, 20, 80, 23);
+  label1 = new GLabel(this, 140, 8, 29, 23);
   label1.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
   label1.setText("y");
-  label1.setLocalColorScheme(GCScheme.YELLOW_SCHEME);
+  label1.setTextBold();
+  label1.setLocalColorScheme(GCScheme.SCHEME_15);
   label1.setOpaque(false);
-  mensaje = new GLabel(this, 459, 19, 80, 20);
-  mensaje.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
-  mensaje.setLocalColorScheme(GCScheme.YELLOW_SCHEME);
-  mensaje.setOpaque(false);
+  floyd = new GButton(this, 508, 8, 117, 25);
+  floyd.setText("Camino mínimo");
+  floyd.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
+  floyd.addEventHandler(this, "warshall");
+  clean = new GButton(this, 635, 8, 83, 25);
+  clean.setText("Reiniciar");
+  clean.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
+  clean.addEventHandler(this, "limpiar");
+  elim = new GButton(this, 408, 9, 94, 25);
+  elim.setText("Eliminar estrella");
+  elim.setLocalColorScheme(GCScheme.PURPLE_SCHEME);
+  elim.addEventHandler(this, "eliminar");
 }
 
 // Variable declarations 
@@ -95,4 +187,6 @@ GButton btndr;
 GDropList star1; 
 GDropList star2; 
 GLabel label1; 
-GLabel mensaje; 
+GButton floyd; 
+GButton clean; 
+GButton elim; 

@@ -4,12 +4,16 @@ int x2;
 int y1;
 int y2;
 int peso;
+Estrella i;
+Estrella f;
 
-Arista(int e1, int i1, int e2,int i2, int p){
-  this.x1=e1;
-  this.y1=i1;
-  this.x2=e2;
-  this.y2=i2;
+Arista(Estrella ini, Estrella fin, int p){
+  this.i=ini;
+  this.f=fin;
+  this.x1=ini.x1+25;
+  this.y1=ini.y1+25;
+  this.x2=fin.x1+25;
+  this.y2=fin.y1+25;
   this.peso = p;
 }
 
