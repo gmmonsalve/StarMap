@@ -9,17 +9,12 @@ int n=0,tam=0; //variable de control para las imágenes
 PImage back,ga; //fondo
 ArrayList<String> nombres = new ArrayList();
 
-import processing.sound.*;
-  
-  SoundFile file;
-  String audioName = "music.mp3";
-  String path;
+//import processing.sound.*;
+   //SoundFile file;
+     
 
 public void setup(){
   
-  path = sketchPath(audioName);
-    file = new SoundFile(this, path);
-    file.play();
     
   back = loadImage("espacio.jpg");
   ga = loadImage("mw.jpg");
